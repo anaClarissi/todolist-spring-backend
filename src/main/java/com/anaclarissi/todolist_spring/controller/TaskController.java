@@ -3,12 +3,14 @@ package com.anaclarissi.todolist_spring.controller;
 import com.anaclarissi.todolist_spring.model.Task;
 import com.anaclarissi.todolist_spring.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/tasks")
+@CrossOrigin(origins = "*")
 public class TaskController {
 
     @Autowired
@@ -28,10 +30,12 @@ public class TaskController {
 
     }
 
-    @DeleteMapping
-    public void remove(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> remove(@PathVariable Long id) {
 
         service.delete(id);
+
+        return ResponseEntity.noContent().build();
 
     }
 
