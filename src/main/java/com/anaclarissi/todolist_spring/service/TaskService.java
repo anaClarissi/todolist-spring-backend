@@ -3,11 +3,13 @@ package com.anaclarissi.todolist_spring.service;
 import com.anaclarissi.todolist_spring.model.Task;
 import com.anaclarissi.todolist_spring.repository.TaskRepository;
 import com.anaclarissi.todolist_spring.service.exceptions.ResourceNotFoundException;
+import com.anaclarissi.todolist_spring.service.exceptions.TaskValidationException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -24,11 +26,7 @@ public class TaskService {
 
     public Task create(Task task) {
 
-        if (task.getEndDate().isBefore(task.getStartDate())) {
-
-            throw new IllegalArgumentException("Erro: The end date cannot be earlier than the start date.");
-
-        }
+        validateDate(task);
 
         return repository.save(task);
 
@@ -37,6 +35,8 @@ public class TaskService {
     public Task update(Long id,Task task) {
 
         try {
+
+            validateDate(task);
 
             Task entity = repository.getReferenceById(id);
 
@@ -61,6 +61,28 @@ public class TaskService {
         } catch (EmptyResultDataAccessException e) {
 
             throw new ResourceNotFoundException(id);
+
+        }
+
+    }
+
+    private void validateDate(Task task) {
+
+        if (task.getEndDate().isBefore(task.getStartDate())) {
+
+            throw new TaskValidationException("The end date cannot be earlier than the start date.");
+
+        }
+
+        if (task.getStartDate().isBefore(LocalDate.now())) {
+
+            throw new TaskValidationException("the start date cannot be earlier than the current date.");
+
+        }
+
+        if (task.getName() == null || task.getName().trim().isEmpty()) {
+
+            throw new TaskValidationException("The name of the tariff is mandatory.");
 
         }
 
