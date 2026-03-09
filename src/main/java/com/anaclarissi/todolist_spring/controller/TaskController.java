@@ -5,7 +5,9 @@ import com.anaclarissi.todolist_spring.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -17,16 +19,22 @@ public class TaskController {
     private TaskService service;
 
     @GetMapping
-    public List<Task> getAll() {
+    public ResponseEntity<List<Task>> getAll() {
 
-        return  service.listAll();
+        List<Task> list = service.listAll();
+
+        return ResponseEntity.ok().body(list);
 
     }
 
     @PostMapping
-    public Task save(@RequestBody Task task) {
+    public ResponseEntity<Task> save(@RequestBody Task task) {
 
-        return  service.create(task);
+        task = service.create(task);
+
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(task.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(task);
 
     }
 
@@ -39,7 +47,7 @@ public class TaskController {
 
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
 
         service.delete(id);
