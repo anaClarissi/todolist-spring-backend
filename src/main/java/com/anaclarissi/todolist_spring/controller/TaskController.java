@@ -30,6 +30,15 @@ public class TaskController {
 
     }
 
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Task> update(@PathVariable Long id, @RequestBody Task task) {
+
+        task = service.update(id, task);
+
+        return ResponseEntity.ok().body(task);
+
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
 
