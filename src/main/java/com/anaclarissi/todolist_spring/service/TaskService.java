@@ -2,7 +2,10 @@ package com.anaclarissi.todolist_spring.service;
 
 import com.anaclarissi.todolist_spring.model.Task;
 import com.anaclarissi.todolist_spring.repository.TaskRepository;
+import com.anaclarissi.todolist_spring.service.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,17 +36,33 @@ public class TaskService {
 
     public Task update(Long id,Task task) {
 
-        Task entity = repository.getReferenceById(id);
+        try {
 
-        updateDate(entity, task);
+            Task entity = repository.getReferenceById(id);
 
-        return repository.save(entity);
+            updateDate(entity, task);
+
+            return repository.save(entity);
+
+        } catch (EntityNotFoundException e) {
+
+            throw new ResourceNotFoundException(id);
+
+        }
 
     }
 
     public void delete(Long id) {
 
-        repository.deleteById(id);
+        try {
+
+            repository.deleteById(id);
+
+        } catch (EmptyResultDataAccessException e) {
+
+            throw new ResourceNotFoundException(id);
+
+        }
 
     }
 
